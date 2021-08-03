@@ -10,16 +10,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * Класс управляет структурой данных для хранения пользователей
  *
  * @author Kioresko Igor
- * @version 0.1
+ * @version 0.2
  */
 @ThreadSafe
 public class UserStorage {
     @GuardedBy("this")
-    private final ConcurrentHashMap<Integer, User> storage;
-
-    public UserStorage() {
-        this.storage = new ConcurrentHashMap<>();
-    }
+    private final ConcurrentHashMap<Integer, User> storage = new ConcurrentHashMap<>();
 
     /**
      * Метод добавляет пользователя в хранилище если он в нем отсутствует
@@ -28,12 +24,8 @@ public class UserStorage {
      * @return true если операция прошла успешно, иначе false.
      */
     public synchronized boolean add(User user) {
-        boolean result = false;
-        if (!storage.containsKey(user.getId())) {
-            storage.put(user.getId(), user);
-            result = true;
-        }
-        return result;
+        return Objects.equals(
+                storage.putIfAbsent(user.getId(), user), null);
     }
 
     /**
@@ -43,12 +35,8 @@ public class UserStorage {
      * @return true если операция прошла успешно, иначе false.
      */
     public synchronized boolean update(User user) {
-        boolean result = false;
-        if (!storage.contains(user)) {
-            storage.put(user.getId(), user);
-            result = true;
-        }
-        return result;
+        int id = user.getId();
+        return storage.replace(id, storage.get(id), user);
     }
 
     /**
