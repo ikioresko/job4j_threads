@@ -26,7 +26,7 @@ public class CountBarrier {
 
     public void await() {
         synchronized (monitor) {
-            while (!(count >= total)) {
+            while (count < total) {
                 try {
                     System.out.println("await " + Thread.currentThread().getName());
                     monitor.wait();
