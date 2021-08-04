@@ -16,11 +16,9 @@ public class CountBarrier {
 
     public void count() {
         synchronized (monitor) {
-            while (count != total) {
-                System.out.println("count " + Thread.currentThread().getName());
-                count++;
-                monitor.notifyAll();
-            }
+            System.out.println("count " + Thread.currentThread().getName());
+            count++;
+            monitor.notifyAll();
         }
     }
 
@@ -40,7 +38,9 @@ public class CountBarrier {
     public static void main(String[] args) {
         CountBarrier b = new CountBarrier(5);
         Thread master = new Thread(() -> {
-            b.count();
+            for (int i = 0; i < 5; i++) {
+                b.count();
+            }
             System.out.println(Thread.currentThread().getName() + " work");
         }, "master");
         Thread slave = new Thread(() -> {
