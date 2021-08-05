@@ -16,7 +16,11 @@ public class SimpleBlockingQueueTest {
         @Override
         public void run() {
             synchronized (queue) {
-                this.queue.poll();
+                try {
+                    this.queue.poll();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
         }
     }
@@ -30,9 +34,13 @@ public class SimpleBlockingQueueTest {
 
         @Override
         public void run() {
-                    queue.offer(1);
-                    queue.offer(2);
-                    queue.offer(3);
+            try {
+                queue.offer(1);
+                queue.offer(2);
+                queue.offer(3);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
