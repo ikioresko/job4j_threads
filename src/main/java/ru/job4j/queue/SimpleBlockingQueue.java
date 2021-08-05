@@ -20,7 +20,7 @@ public class SimpleBlockingQueue<T> {
         synchronized (queue) {
             System.out.println(Thread.currentThread().getName() + " offer producer start");
             while (queue.size() == size) {
-                    queue.wait();
+                queue.wait();
             }
             queue.offer(value);
             queue.notifyAll();
@@ -31,13 +31,19 @@ public class SimpleBlockingQueue<T> {
     public T poll() throws InterruptedException {
         synchronized (queue) {
             System.out.println(Thread.currentThread().getName() + " consumer poll start");
-                while (queue.size() < 1) {
-                    queue.wait();
-                }
+            while (queue.size() < 1) {
+                queue.wait();
+            }
             T t = queue.poll();
             queue.notifyAll();
             System.out.println(Thread.currentThread().getName() + " consumer poll fin " + t);
             return t;
+        }
+    }
+
+    public boolean isEmpty() {
+        synchronized (queue) {
+            return queue.isEmpty();
         }
     }
 }
