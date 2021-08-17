@@ -1,6 +1,5 @@
 package ru.job4j.pool;
 
-import net.jcip.annotations.GuardedBy;
 import net.jcip.annotations.ThreadSafe;
 import ru.job4j.queue.SimpleBlockingQueue;
 
@@ -10,7 +9,6 @@ import java.util.List;
 @ThreadSafe
 public class ThreadPool {
     private final int size = Runtime.getRuntime().availableProcessors();
-    @GuardedBy("tasks")
     private final SimpleBlockingQueue<Runnable> tasks;
     private final List<Thread> threads = new LinkedList<>();
 
@@ -19,25 +17,24 @@ public class ThreadPool {
     }
 
     public void initPool() throws InterruptedException {
-        synchronized (tasks) {
-            for (int i = 0; i < size; i++) {
-                while (tasks.isEmpty()) {
-                    tasks.wait();
-                }
-                threads.add((Thread) tasks.poll());
+        for (int i = 0; i < size; i++) {
+            Thread task = (Thread) tasks.poll();
+            if (task.isInterrupted()) {
+                break;
             }
+            task.start();
+            threads.add(task);
         }
     }
 
     public void work(Runnable job) throws InterruptedException {
-        synchronized (tasks) {
-            tasks.offer(job);
-            tasks.notifyAll();
-        }
+        tasks.offer(job);
     }
 
     public synchronized void shutdown() {
-        threads.stream().filter(thread -> !thread.isInterrupted()).forEach(Thread::interrupt);
+        for (int i = 0; i < size; i++) {
+            threads.get(i).interrupt();
+        }
     }
 
     public static void main(String[] args) throws InterruptedException {
