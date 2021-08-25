@@ -38,14 +38,7 @@ public class ParallelSearch<T> extends RecursiveTask<Integer> {
         ParallelSearch<T> psRight = new ParallelSearch<>(array, element, mid + 1, to);
         psLeft.fork();
         psRight.fork();
-        Integer l = psLeft.join();
-        Integer r = psRight.join();
-        if (l > -1) {
-            return l;
-        } else if (r > -1) {
-            return r;
-        }
-        return -1;
+        return Math.max(psLeft.join(), psRight.join());
     }
 
     public static Integer getIndex(Object[] array, Object element) {
