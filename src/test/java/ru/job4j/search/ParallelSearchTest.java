@@ -17,15 +17,31 @@ public class ParallelSearchTest {
 
     @Test
     public void findIndexOfElementWhenArrayLengthIs10() {
-        ParallelSearch<String> ps = new ParallelSearch<>();
-        int r = ps.run(getArray(10), "Hello5");
+        int r = ParallelSearch.getIndex(getArray(10), "Hello5");
         assertThat(r, is(5));
     }
 
     @Test
     public void findIndexOfElementWhenArrayLengthIs10000000() {
-        ParallelSearch<String> ps = new ParallelSearch<>();
-        int r = ps.run(getArray(10000000), "Hello5000000");
+        int r = ParallelSearch.getIndex(getArray(10000000), "Hello5000000");
         assertThat(r, is(5000000));
+    }
+
+    @Test
+    public void findIndexOfElementWhenElementIsAbsent() {
+        int r = ParallelSearch.getIndex(getArray(10), "Hello15");
+        assertThat(r, is(-1));
+    }
+
+    @Test
+    public void findIndexOfElementWhenElementIsAbsents() {
+        int r = ParallelSearch.getIndex(getArray(100), "Hello150");
+        assertThat(r, is(-1));
+    }
+
+    @Test
+    public void findIndexOfElementWhenArrayLengthIs1000() {
+        int r = ParallelSearch.getIndex(getArray(1000), "Hello322");
+        assertThat(r, is(322));
     }
 }

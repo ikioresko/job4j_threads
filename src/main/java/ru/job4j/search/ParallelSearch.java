@@ -17,16 +17,9 @@ public class ParallelSearch<T> extends RecursiveTask<Integer> {
         this.to = to;
     }
 
-    public ParallelSearch() {
-        this.array = null;
-        this.element = null;
-        from = 0;
-        to = 0;
-    }
-
     private int find(T[] array) {
         int index = -1;
-        for (int i = from; to > i; i++) {
+        for (int i = from; to >= i; i++) {
             if (element.equals(array[i])) {
                 index = i;
                 break;
@@ -37,24 +30,27 @@ public class ParallelSearch<T> extends RecursiveTask<Integer> {
 
     @Override
     protected Integer compute() {
-        int index = -1;
-        if (from <= 10 || from + 10 >= to) {
-            index = find(array);
-        } else {
-                int mid = (from + to) / 2;
-                ParallelSearch<T> psLeft = new ParallelSearch<>(array, element, from, mid);
-                ParallelSearch<T> psRight = new ParallelSearch<>(array, element, mid + 1, to);
-                psLeft.fork();
-                psRight.fork();
-                psLeft.join();
-                psRight.join();
+        if (to - from <= 10) {
+            return find(array);
         }
-        return index;
+        int mid = (from + to) / 2;
+        ParallelSearch<T> psLeft = new ParallelSearch<>(array, element, from, mid);
+        ParallelSearch<T> psRight = new ParallelSearch<>(array, element, mid + 1, to);
+        psLeft.fork();
+        psRight.fork();
+        Integer l = psLeft.join();
+        Integer r = psRight.join();
+        if (l > -1) {
+            return l;
+        } else if (r > -1) {
+            return r;
+        }
+        return -1;
     }
 
-    public Integer run(T[] array, T element) {
+    public static Integer getIndex(Object[] array, Object element) {
         ForkJoinPool forkJoinPool = new ForkJoinPool();
-        return forkJoinPool.invoke(new ParallelSearch<T>(array, element, 0, array.length - 1));
+        return forkJoinPool.invoke(new ParallelSearch<>(array, element, 0, array.length - 1));
     }
 
     @Override
