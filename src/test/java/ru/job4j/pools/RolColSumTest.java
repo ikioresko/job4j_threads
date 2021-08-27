@@ -25,14 +25,12 @@ public class RolColSumTest {
         t3.start();
         t3.join();
         List<Integer> rsl = new ArrayList<>();
-        for (RolColSum.Sums[] it : list) {
-            for (RolColSum.Sums sums : it) {
-                if (sums != null) {
-                    rsl.add(sums.getColSum());
-                    rsl.add((sums.getRowSum()));
-                }
-            }
-        }
+        rsl.add(list.get(0)[0].getColSum());
+        rsl.add(list.get(0)[0].getRowSum());
+        rsl.add(list.get(1)[1].getColSum());
+        rsl.add(list.get(1)[1].getRowSum());
+        rsl.add(list.get(2)[2].getColSum());
+        rsl.add(list.get(2)[2].getRowSum());
         assertThat(rsl, is(List.of(12, 6, 15, 15, 18, 24)));
     }
 
